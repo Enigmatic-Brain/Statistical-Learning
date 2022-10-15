@@ -1,0 +1,109 @@
+---
+title: "Introduction to Statistical Learning."
+output:
+  html_document:
+    df_print: paged
+---
+
+Statistical Learning refers to a vast set of tools for understanding data. These tools can be classified as _supervised_ and _unsupervised_. Broadly speaking, _supervised statistical learning_ involves building a statistical model for predicting, or estimating, an output based on the labeled datasets. With _unsupervised statistical learning_, there are inputs but no supervising outputs, or building a statistical model for prediction based on the unlabeled datasets.
+
+## Notation
+
+For the most part of these notebooks I adopt the following notation:
+
+I will use _n_ to represent the number of distinct data points, or observations, in our sample. I will let _p_ denote the number of variables that are available for making predictions. I will let $x_{ij}$ represent the value of the $j^{th}$ variable for the $i^{th}$ observation, where $i = 1,2,...,n$ and $j = 1,2,...,n$. Throughout these notebooks and future notebooks, _i_ will be used to index the samples or observations (from 1 to _n_) and _j_ will be used to index the variables (from 1 to _p_). I let $\boldsymbol{X}$ denote $n \times p$ matrix, where _n_ represents the rows or the observations or the data points and p represents the columns or the variables. $$ \boldsymbol{X} = \begin{bmatrix}
+x_{11} & x_{12} & \dots & x_{1p} \\
+x_{21} & x_{22} & \dots & x_{2p} \\
+\vdots & \vdots & \ddots & \vdots \\
+x_{n1} & x_{n2} & \dots & x_{np} \\
+\end{bmatrix}$$
+
+At times we will be interested in the rows of $\boldsymbol{X}$, which I write as vector $x_i$ of length _p_, where i indicates the row number or the entry number: $$x_i = \begin{pmatrix} 
+x_{i1} \\ x_{i2} \\ \vdots \\ x_{ip}
+\end{pmatrix}$$ 
+At other times we will instead be interested in the columns of $\boldsymbol{X}$, which I write as $\textbf{x}_1,\textbf{x}_2, \dots, \textbf{x}_p$, where p indicates the variable or the column number. Each is a vector of length _n_. That is, $$\textbf{x}_j = \begin{pmatrix} 
+x_{1j} \\ x_{2j} \\ \vdots \\ x_{nj}
+\end{pmatrix}$$ 
+So our dataset or the matrix $\boldsymbol{X}$ can be represented as: $$\boldsymbol{X} = 
+\begin{pmatrix}
+\textbf{x}_1 & \textbf{x}_2 & \dots & \textbf{x}_p 
+\end{pmatrix}, 
+$$
+or $$
+\boldsymbol{X} = \begin{pmatrix}
+x^T_1 \\ x^T_2 \\ \vdots \\ x^T_n 
+\end{pmatrix}
+$$
+I use $y_i$ to denote the $i^{th}$ observation of the variable on which we wish to make predictions, also known as the true label. It'll be a vector of length same as the number of observations or the data points, _n_: $$\textbf{y} = \begin{pmatrix}
+y_1 \\ y_2 \\ \vdots \\ y_n
+\end{pmatrix}$$ 
+Then our observed data consists of $\{(x_1, y_1), (x2, y2), \dots, (x_n, y_n)\}$, where $x_i$ is the vector of length p. (If p = 1, then $x_i$ is simply a scalar.)
+
+Matrices will be denoted using _bold capitals_, such as $\textbf{A}$. Random variables will be denoted using _capital normal format_, e.g. $\text{A}$, regardless of their dimensions. 
+To indicate that an object is a scalar, we will use $\text{a}\in\mathbb{R}$. To indicate that it is a vector of length $\text{k}$, I will use $\text{a}\in\mathbb{R}^k$ (or $\text{a}\in\mathbb{R}^n$ if it is of length $\text{n}$). I will indicate that an object is an $r \times s$ matrix using $\textbf{A}\in\mathbb{R}^{r\times s}$
+
+
+To further grasp the notation, let's look at an example. Now let's pretend we have access to every patients' medical history in a hospital, which looks something this:
+
+```{python, echo=FALSE, fig.cap = "Patients' medical report"}
+import numpy as np
+import pandas as pd
+from IPython.display import display
+dicti = {'PId': ['P1', 'P2', 'P3', 'P4','P5', 'P6' ],
+        'Age': [12, 41, 31, 45, 56, 65],
+        'Glucose Lvl': [110, 130, 145, 111, 123, 321], 
+        'Diabetic' : ['Yes', 'No', 'No', 'Yes', 'No', 'Yes']}
+
+data = pd.DataFrame(dicti)
+data.set_index('PId')
+```
+
+Let's give the above notation a go with this simple and very random set of numbers. Let's write matrix $\boldsymbol{X}$: $$ \boldsymbol{X} = \begin{bmatrix}
+P1 & 12 & 110 & Yes\\
+P2 & 41 & 130 & No\\
+P3 & 31 & 145 & No\\
+P4 & 45 & 111 & Yes\\
+P5 & 56 & 123 & No\\
+P6 & 65 & 321 & Yes
+\end{bmatrix}
+$$ 
+Note that the matrix $\boldsymbol{X} \in \mathbb{R}^{6 \times 4}$.Further, we write row 2, row 4, row 6 of $\boldsymbol{X}$ which will be denoted by vectors $x_2, x_4, x_6$ respectively: $$x_2 = \begin{pmatrix}
+P2 \\ 41 \\ 130 \\ No
+\end{pmatrix}; x_4 = \begin{pmatrix} P4 \\ 45 \\ 111 \\ Yes \end{pmatrix}; x_6 = \begin{pmatrix} P6 \\ 65 \\ 321 \\ Yes \end{pmatrix}$$
+
+Again, $x_i \in \mathbb{R}^4$. Similarly, we can write the column(s) 1, 3, 4 which are vectors of length $n$ denoted by $\textbf{x}_1, \textbf{x}_3, \textbf{x}_4$ respectively: 
+$$\textbf{x}_1 = \begin{pmatrix}
+P1 \\ P2 \\ P3 \\ P4 \\ P5 \\ P6
+\end{pmatrix}; \textbf{x}_3 = \begin{pmatrix} 110 \\ 130 \\ 145\\111 \\ 123\\ 321 \end{pmatrix}; \textbf{x}_4 = \begin{pmatrix} Yes \\ No \\ No \\ Yes \\No \\Yes \end{pmatrix}$$
+$\textbf{x} \in \mathbb{R}^6$. Finally, if we ask Machine Learning to predict whether or not a patient has diabetes based on a set of factors or columns, like _Age_, _Glucose Lvl_, then we can denote $\textbf{y}$ as the column or variable _Diabetic_ mostly because that is the result we're after, whether or not diabetes is present.  $$\textbf{y} = \begin{pmatrix}
+Yes\\ No \\ No \\ Yes \\No \\Yes
+\end{pmatrix}$$
+
+The next notebook will be a more in-depth look into Statistical Learning, where topics such as Machine Learning (ML) jargon, ML system classification, and more will be covered.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
